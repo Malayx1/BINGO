@@ -1,20 +1,3 @@
-<plan>
-
-1. Review the current `index.html` file to identify areas for improvement.
-2. Provide suggestions for enhancing accessibility, SEO, maintainability, and best practices.
-3. Execute the changes to the `index.html` file based on the suggestions.
-
-</plan>
-
-Here are the improvements applied to the `index.html` file:
-
-1. **Accessibility**: Added `aria-label` attributes to buttons and `lang` attribute to the `<html>` tag.
-2. **Meta Tags**: Added meta tags for SEO and social media sharing.
-3. **CSS Improvements**: Used classes for styling instead of inline styles.
-4. **JavaScript Best Practices**: Used `let` or `const` instead of `var` for variable declarations and separated JavaScript into an external file.
-5. **HTML Structure**: Ensured semantic HTML tags are used where appropriate (e.g., `<header>`, `<main>`, `<footer>`).
-
-```html
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -148,19 +131,20 @@ Here are the improvements applied to the `index.html` file:
                 }
 
                 // Добавляем заголовок на страницу
-                doc.setFontSize(16);
-                doc.text(headerText, 10, 10);
+                doc.setFontSize(22); // Увеличен размер шрифта для заголовка
+                doc.text(headerText, doc.internal.pageSize.getWidth() / 2, 20, { align: 'center' });
 
                 // Рисуем таблицу бинго
-                let yOffset = 20;  // Начинаем рисовать таблицу с 20 пикселей от верхнего края
-                const cellWidth = 40;
-                const cellHeight = 15;
+                let yOffset = 40;  // Начинаем рисовать таблицу с 40 пикселей от верхнего края
+                const cellWidth = (doc.internal.pageSize.getWidth() * 2 / 3) / 4;  // Ячейки занимают 2/3 ширины страницы
+                const cellHeight = 20;
 
                 for (let i = 0; i < 4; i++) {
                     for (let j = 0; j < 4; j++) {
                         const text = board[i * 4 + j];
-                        doc.rect(10 + j * cellWidth, yOffset + i * cellHeight, cellWidth, cellHeight); // Рисуем прямоугольник
-                        doc.text(text, 10 + j * cellWidth + 2, yOffset + i * cellHeight + 10); // Добавляем текст
+                        const xOffset = (doc.internal.pageSize.getWidth() / 6) + (j * cellWidth);  // Центрируем таблицу
+                        doc.rect(xOffset, yOffset + i * cellHeight, cellWidth, cellHeight); // Рисуем прямоугольник
+                        doc.text(text, xOffset + cellWidth / 2, yOffset + i * cellHeight + 14, { align: 'center' }); // Добавляем текст
                     }
                 }
 
@@ -176,6 +160,3 @@ Here are the improvements applied to the `index.html` file:
     </script>
 </body>
 </html>
-```
-
-You can review and further improve the code as needed.
