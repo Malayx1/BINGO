@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Бинго 4x4</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+        .bingo-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+        .bingo-container {
+            display: grid;
+            grid-template-columns: repeat(4, auto);
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .bingo-cell {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            border: 2px solid #333;
+            background-color: #fff;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            word-wrap: break-word;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        textarea {
+            width: 300px;
+            height: 100px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <textarea id="bingoInput" placeholder="Введите элементы списка для бинго, по одному на строке"></textarea>
+        <input type="text" id="headerInput" placeholder="Введите заголовок для PDF">
+    </div>
+    <div class="bingo-wrapper" id="bingoWrapper">
+        <!-- Ячейки бинго будут сгенерированы с помощью JavaScript -->
+    </div>
+    <button onclick="generateMultipleBingos()">Создать 100 бланков</button>
+    <button onclick="downloadPDF()">Скачать бланки в формате PDF</button>
+
+    <!-- Подключаем библиотеку SheetJS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <script>
+        const bingoBoards = [];
+
+        // Функция для перемешивания массива
+        function shuffle(array) {
+            let shuffledArray = [...array];
+
+            // Применяем алгоритм Фишера-Йетса
+            for (let i = shuffledArray.length - 1; i > 0; i--) {
+                const randomBuffer = new Uint32Array(1);
+                window.crypto.getRandomValues(randomBuffer);
+                const j = randomBuffer[0] % (i + 1);
+                [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]];
+            }
+            return shuffledArray;
+        }
+
+        // Генерация одного бланка бинго
+        function generateBingo(bingoItems) {
+            const bingoBoard = [];
+            const shuffledItems = shuffle([...bingoItems]).slice(0, 16); // Берём 16 случайных элементов
+
+            for (let i = 0; i < 16; i++) {
+                bingoBoard.push(shuffledItems[i]);
+            }
+            return bingoBoard;
+        }
+
+        // Генерация 100 бланков бинго
+        function generateMultipleBingos() {
+            const bingoWrapper = document.getElementById('bingoWrapper');
+            const inputText = document.getElementById('bingoInput').value;
+            const bingoItems = inputText.split('\n').map(item => item.trim()).filter(item => item !== '');
+
+            if (bingoItems.length < 16) {
+                alert('Пожалуйста, введите как минимум 16 элементов для генерации бланка.');
+                return;
+            }
+
+            bingoWrapper.innerHTML = ''; // Очищаем поле перед генерацией новых бланков
+            bingoBoards.length = 0; // Очищаем массив бланков
+
+            // Генерация 100 бланков
+            for (let i = 0; i < 100; i++) {
+                const board = generateBingo(bingoItems);
+                bingoBoards.push(board);
+            }
+        }
+
+        // Функция для скачивания PDF с бинго
+        function downloadPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const headerText = document.getElementById('headerInput').value || "Бинго 4x4";
+
+            bingoBoards.forEach((board, index) => {
+                // Если это не первая страница, добавляем новую
+                if (index > 0) {
+                    doc.addPage();
+                }
+
+                // Добавляем заголовок на страницу
+                doc.setFontSize(16);
+                doc.text(headerText, 10, 10);
+
+                // Рисуем таблицу бинго
+                let yOffset = 20;  // Начинаем рисовать таблицу с 20 пикселей от верхнего края
+                const cellWidth = 40;
+                const cellHeight = 15;
+
+                for (let i = 0; i < 4; i++) {
+                    for (let j = 0; j < 4; j++) {
+                        const text = board[i * 4 + j];
+                        doc.rect(10 + j * cellWidth, yOffset + i * cellHeight, cellWidth, cellHeight); // Рисуем прямоугольник
+                        doc.text(text, 10 + j * cellWidth + 2, yOffset + i * cellHeight + 10); // Добавляем текст
+                    }
+                }
+
+                // Переходим на новую страницу, если это не последняя
+                if (index < bingoBoards.length - 1) {
+                    doc.addPage();
+                }
+            });
+
+            // Скачиваем PDF файл
+            doc.save('bingo_boards.pdf');
+        }
+    </script>
+</body>
+</html>
