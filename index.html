@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Generate and download customizable Bingo boards in PDF format.">
+    <meta name="description" content="Генерация и скачивание настраиваемых бланков Бинго в формате PDF.">
     <meta property="og:title" content="Бинго 4x4">
-    <meta property="og:description" content="Generate and download customizable Bingo boards in PDF format.">
+    <meta property="og:description" content="Генерация и скачивание настраиваемых бланков Бинго в формате PDF.">
     <title>Бинго 4x4</title>
     <style>
         body {
@@ -124,15 +124,15 @@
             const doc = new jsPDF();
             const headerText = document.getElementById('headerInput').value || "Бинго 4x4";
 
+            doc.setFont("times", "normal"); // Установка шрифта поддерживающего кириллицу
+            doc.setFontSize(22); // Увеличен размер шрифта для заголовка
+            doc.text(headerText, doc.internal.pageSize.getWidth() / 2, 20, { align: 'center' });
+
             bingoBoards.forEach((board, index) => {
                 // Если это не первая страница, добавляем новую
                 if (index > 0) {
                     doc.addPage();
                 }
-
-                // Добавляем заголовок на страницу
-                doc.setFontSize(22); // Увеличен размер шрифта для заголовка
-                doc.text(headerText, doc.internal.pageSize.getWidth() / 2, 20, { align: 'center' });
 
                 // Рисуем таблицу бинго
                 let yOffset = 40;  // Начинаем рисовать таблицу с 40 пикселей от верхнего края
