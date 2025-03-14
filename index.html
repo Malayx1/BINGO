@@ -6,6 +6,7 @@
     <meta name="description" content="Генерация и скачивание настраиваемых бланков Бинго в формате PDF.">
     <meta property="og:title" content="Бинго 4x4">
     <meta property="og:description" content="Генерация и скачивание настраиваемых бланков Бинго в формате PDF.">
+    <meta http-equiv="Content-Security-Policy" content="style-src 'self' 'unsafe-inline' 'https://www.gstatic.com' github.githubassets.com; script-src 'self' 'unsafe-inline' 'https://cdnjs.cloudflare.com';">
     <title>Бинго 4x4</title>
     <style>
         body {
@@ -134,7 +135,7 @@
                         heading: docx.HeadingLevel.HEADING_1,
                         alignment: docx.AlignmentType.CENTER,
                     }),
-                    ...bingoBoards.map((board, index) => {
+                    ...bingoBoards.map((board) => {
                         const rows = [];
                         for (let i = 0; i < 4; i++) {
                             const cells = [];
