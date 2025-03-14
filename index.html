@@ -53,22 +53,29 @@
             height: 100px;
             margin-top: 20px;
         }
+        input[type="number"] {
+            width: 100px;
+            margin-top: 20px;
+            padding: 5px;
+            font-size: 16px;
+        }
     </style>
 </head>
 <body>
     <div>
         <textarea id="bingoInput" placeholder="Введите элементы списка для бинго, по одному на строке"></textarea>
         <input type="text" id="headerInput" placeholder="Введите заголовок для PDF">
+        <input type="number" id="numberOfBoards" placeholder="Количество бланков" min="1" value="1">
     </div>
     <div class="bingo-wrapper" id="bingoWrapper">
         <!-- Ячейки бинго будут сгенерированы с помощью JavaScript -->
     </div>
-    <button onclick="generateMultipleBingos()" aria-label="Создать 100 бланков">Создать 100 бланков</button>
-    <button onclick="downloadPDF()" aria-label="Скачать бланки в формате PDF">Скачать бланки в формате PDF</button>
+    <button onclick="generateAndDownloadPDF()" aria-label="Создать и скачать бланки в формате PDF">Создать и скачать бланки в формате PDF</button>
 
     <!-- Подключаем библиотеку SheetJS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.cyrillic.min.js"></script>
     <script>
         const bingoBoards = [];
 
@@ -97,11 +104,12 @@
             return bingoBoard;
         }
 
-        // Генерация 100 бланков бинго
-        function generateMultipleBingos() {
+        // Генерация и скачивание PDF
+        function generateAndDownloadPDF() {
             const bingoWrapper = document.getElementById('bingoWrapper');
             const inputText = document.getElementById('bingoInput').value;
             const bingoItems = inputText.split('\n').map(item => item.trim()).filter(item => item !== '');
+            const numberOfBoards = parseInt(document.getElementById('numberOfBoards').value, 10) || 1;
 
             if (bingoItems.length < 16) {
                 alert('Пожалуйста, введите как минимум 16 элементов для генерации бланка.');
@@ -111,20 +119,17 @@
             bingoWrapper.innerHTML = ''; // Очищаем поле перед генерацией новых бланков
             bingoBoards.length = 0; // Очищаем массив бланков
 
-            // Генерация 100 бланков
-            for (let i = 0; i < 100; i++) {
+            // Генерация указанного количества бланков
+            for (let i = 0; i < numberOfBoards; i++) {
                 const board = generateBingo(bingoItems);
                 bingoBoards.push(board);
             }
-        }
 
-        // Функция для скачивания PDF с бинго
-        function downloadPDF() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             const headerText = document.getElementById('headerInput').value || "Бинго 4x4";
 
-            doc.setFont("times", "normal"); // Установка шрифта поддерживающего кириллицу
+            doc.setFont("cyrillic"); // Установка шрифта поддерживающего кириллицу
             doc.setFontSize(22); // Увеличен размер шрифта для заголовка
             doc.text(headerText, doc.internal.pageSize.getWidth() / 2, 20, { align: 'center' });
 
